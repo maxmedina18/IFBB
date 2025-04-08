@@ -27,17 +27,15 @@ st_symbol = smp.symbols('st', real=True, positive=True)
 d_symbol = smp.symbols('d', real=True, positive=True)
 l_symbol = smp.symbols('l', real=True, positive=True)
 r_symbol = smp.symbols('r', real=True, positive=True)
+e_symbol = smp.symbols('e', real=True, positive=True)
 
+sun_irradiance1 = 2 * pi_symbol* h_symbol* c_symbol**2/l_symbol**6
+sun_irradiance2 = 1 / e_symbol**h_symbol*c_symbol/l_symbol*k_symbol*st_symbol-1
 
+sun_irradiance = sun_irradiance1 * sun_irradiance2
+sun_area = 4*pi_symbol*sr_symbol**2
+sphere_area = 4*pi_symbol*d_symbol**2
+spacecraft_radius = pi_symbol*r_symbol**2
 
-
-
-#x = smp.symbols('x', real=True)
-#f = smp.sin(x)**3 * smp.exp(-5*x)
-#print(smp.integrate(f, x))
-
-
-
-
-
-
+f = ((sun_irradiance*sun_area)/sphere_area)*spacecraft_radius
+print(smp.integrate(f, l_symbol))
