@@ -38,4 +38,4 @@ sphere_area = 4*pi_symbol*d_symbol**2
 spacecraft_radius = pi_symbol*r_symbol**2
 
 f = ((sun_irradiance*sun_area)/sphere_area)*spacecraft_radius
-print(smp.integrate(f, l_symbol))
+print("BETA** SYMBOLIC INTEGRAL:",smp.integrate(f, l_symbol), " **BETA")
