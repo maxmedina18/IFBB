@@ -21,9 +21,33 @@ def integrand(wavelength_nm):
     exponential_term = planck_constant * speed_of_light / (wavelength_m * boltzmann_constant * sun_surface_temp_K)
     
     spectral_radiance = (numerator / denominator) * (np.float64(1) / (np.exp(exponential_term) - np.float64(1)))
-    return spectral_radiance
+    
+    # Add your spectral absorbance multiplication here
+    spectral_absorbance = calculate_spectral_absorbance(wavelength_nm)  # You'll implement this function
+    return spectral_radiance * spectral_absorbance
 
-def calculate_absorption(distance_au, spacecraft_radius_m, wavelength_range_nm):
+def calculate_spectral_absorbance(wavelength_nm):
+    """
+    Calculate the spectral absorbance at a given wavelength.
+    Modify this function to implement your specific absorbance model.
+    
+    Parameters:
+    -----------
+    wavelength_nm : float
+        Wavelength in nanometers
+    
+    Returns:
+    --------
+    float
+        Spectral absorbance (0-1)
+    """
+    # Example: constant absorbance of 0.8
+    # Replace this with your actual absorbance model
+
+    
+    return np.float64(0.8)
+
+def calculate_absorption(distance_au, spacecraft_radius_m, wavelength_range_nm, spectral_absorbance):
     """
     Calculate the absorbed power from solar radiation.
     
@@ -35,6 +59,8 @@ def calculate_absorption(distance_au, spacecraft_radius_m, wavelength_range_nm):
         Radius of the spacecraft in meters
     wavelength_range_nm : tuple
         (lower_limit, upper_limit) in nanometers
+    spectral_absorbance : float
+        Spectral absorbance coefficient (0-1)
     
     Returns:
     --------
@@ -58,6 +84,6 @@ def calculate_absorption(distance_au, spacecraft_radius_m, wavelength_range_nm):
                         limit=1000)
     
     # Calculate total power
-    total_power = (result * sun_area) / (np.float64(4) * pi_numerical * distance_m**2) * spacecraft_area
+    total_power = (result * sun_area) / (np.float64(4) * pi_numerical * distance_m**2) * spacecraft_area * spectral_absorbance * np.float64(1e-9)
     
     return total_power, error 
