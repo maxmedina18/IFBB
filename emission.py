@@ -9,10 +9,11 @@ from constants import (
     pi_numerical,
     planck_constant,
     boltzmann_constant,
-    speed_of_light
+    speed_of_light, 
+    e_numerical
 )
 
-def calculate_emission(spacecraft_radius_m, spacecraft_temp_K, wavelength_range_nm, emissivity=1.0):
+def calculate_emission(spacecraft_radius_m, spacecraft_temp_K, wavelength_range_nm):
     """
     Calculate the emitted power from the spacecraft.
     
@@ -21,7 +22,7 @@ def calculate_emission(spacecraft_radius_m, spacecraft_temp_K, wavelength_range_
     spacecraft_radius_m : float
         Radius of the spacecraft in meters
     spacecraft_temp_K : float
-        Temperature of the spacecraft in Kelvin
+        Temperature of the sun in Kelvin
     wavelength_range_nm : tuple
         (lower_limit, upper_limit) in nanometers
     emissivity : float, optional
@@ -32,7 +33,7 @@ def calculate_emission(spacecraft_radius_m, spacecraft_temp_K, wavelength_range_
     tuple
         (emitted_power, error_estimate)
     """
-    spacecraft_area = pi_numerical * np.float64(spacecraft_radius_m)**2
+    spacecraft_area = 4*pi_numerical * np.float64(spacecraft_radius_m)**2
     
     def integrand(wavelength_nm):
         wavelength_m = np.float64(wavelength_nm * 1e-9)
@@ -41,17 +42,21 @@ def calculate_emission(spacecraft_radius_m, spacecraft_temp_K, wavelength_range_
         
         numerator = np.float64(2) * pi_numerical * planck_constant * speed_of_light**2
         denominator = wavelength_m**5
-        exponential_term = planck_constant * speed_of_light / (wavelength_m * boltzmann_constant * spacecraft_temp_K)
+        exponential_term = (e_numerical**planck_constant * speed_of_light / (wavelength_m * boltzmann_constant * spacecraft_temp_K))
+
         
         spectral_radiance = (numerator / denominator) * (np.float64(1) / (np.exp(exponential_term) - np.float64(1)))
-        return spectral_radiance * spacecraft_area * emissivity
+        return spectral_radiance * spacecraft_area
+    
+    def integrand_wrapper(wavelength_nm):
+        return integrand(wavelength_nm, spacecraft_radius_m, spacecraft_temp_K, wavelength_range_nm)
     
     # Perform integration
-    result, error = quad(integrand,
+    result, error = quad(integrand_wrapper,
                         float(wavelength_range_nm[0]),
                         float(wavelength_range_nm[1]),
                         epsabs=1e-10,
                         epsrel=1e-10,
                         limit=1000)
     
-    return result, error 
+    return result * np.float64(1e-9), error * np.float64(1e-9)
