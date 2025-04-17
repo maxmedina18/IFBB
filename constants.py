@@ -10,7 +10,6 @@ pi_numerical = np.float64(np.pi)
 planck_constant = np.float64(sc.Planck)
 boltzmann_constant = np.float64(sc.Boltzmann)
 speed_of_light = np.float64(sc.c)
-e_numerical = np.float64(sc.e)
 
 # Sun properties
 sun_surface_temp_K = np.float64(5772)
