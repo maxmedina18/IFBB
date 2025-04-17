@@ -4,10 +4,9 @@ import numpy as np
 
 # Add the current directory to the Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 from absorption import calculate_absorption, planck_constant
 from emission import calculate_emission, planck_constant
-from constants import AU_to_meters, sun_radius_km, pi_numerical, speed_of_light, boltzmann_constant, sun_surface_temp_K
+from space_constants import AU_to_meters, sun_radius_km, pi_numerical, speed_of_light, boltzmann_constant, sun_surface_temp_K
 from visualize import plot_absorbed_power
 
 def calculate_spectral_power(wavelengths_nm, distance_au, spacecraft_radius_m, spectral_absorbance):
@@ -80,17 +79,19 @@ def main():
         wavelength_range_nm=wavelength_range,
         spectral_absorbance=spectral_absorbance
     )
+
     emitted_power, abs_error = calculate_emission(
         spacecraft_radius_m=spacecraft_radius_m,
         spacecraft_temp_K=spacecraft_temp_k, 
-        wavelength_range_nm=wavelength_range
+        wavelength_range_nm=wavelength_range,
+        spectral_emittance=spectral_emittance
     )
 
 
     
     # Print results
     print("\nResults:")
-    print(f"Absorbed Power: {absorbed_power:.3e} W ± {abs_error:.3e} kW")
+    print(f"Absorbed Power: {absorbed_power:.3e} W ± {abs_error:.3e} W")
 
     print("\nResults:")
     print(f"Power Emitted: {emitted_power:.3e} W ± {abs_error:.3e} kW")
