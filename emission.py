@@ -5,15 +5,18 @@ Calculates the thermal radiation emitted by the spacecraft using Planck's law.
 
 import numpy as np
 from scipy.integrate import quad
-from constants import (
+from space_constants import (
     pi_numerical,
     planck_constant,
     boltzmann_constant,
-    speed_of_light, 
-    e_numerical
+    speed_of_light,
+    sun_surface_temp_K,
+    sun_radius_km,
+    AU_to_meters
 )
 
-def calculate_emission(spacecraft_radius_m, spacecraft_temp_K, wavelength_range_nm):
+
+def calculate_emission(spacecraft_radius_m, spacecraft_temp_k, wavelength_range_nm,spectral_emittance):
     """
     Calculate the emitted power from the spacecraft.
     
@@ -42,17 +45,17 @@ def calculate_emission(spacecraft_radius_m, spacecraft_temp_K, wavelength_range_
         
         numerator = np.float64(2) * pi_numerical * planck_constant * speed_of_light**2
         denominator = wavelength_m**5
-        exponential_term = (e_numerical**planck_constant * speed_of_light / (wavelength_m * boltzmann_constant * spacecraft_temp_K))
+        exponential_term = (planck_constant * speed_of_light / (wavelength_m * boltzmann_constant * spacecraft_temp_k))
 
         
         spectral_radiance = (numerator / denominator) * (np.float64(1) / (np.exp(exponential_term) - np.float64(1)))
         return spectral_radiance * spacecraft_area
     
     def integrand_wrapper(wavelength_nm):
-        return integrand(wavelength_nm, spacecraft_radius_m, spacecraft_temp_K, wavelength_range_nm)
+        return integrand(wavelength_nm, spacecraft_radius_m, spacecraft_temp_k, wavelength_range_nm)
     
     # Perform integration
-    result, error = quad(integrand_wrapper,
+    result, error = quad(integrand,
                         float(wavelength_range_nm[0]),
                         float(wavelength_range_nm[1]),
                         epsabs=1e-10,
