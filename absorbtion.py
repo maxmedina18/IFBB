@@ -1,15 +1,16 @@
 import numpy as np
 from scipy.integrate import quad
-from constants import (
+from space_constants import (
     pi_numerical,
     planck_constant,
     boltzmann_constant,
     speed_of_light,
     sun_surface_temp_K,
     sun_radius_km,
-    AU_to_meters,
-    e_numerical
+    AU_to_meters
 )
+
+
 
 def integrand(wavelength_nm, distance_m, sun_radius_m, spacecraft_radius_m, spectral_absorbance):
     """
@@ -41,10 +42,22 @@ def integrand(wavelength_nm, distance_m, sun_radius_m, spacecraft_radius_m, spec
     # Calculate spectral radiance using Planck's law
     numerator = np.float64(2) * pi_numerical * planck_constant * speed_of_light**2
     denominator = wavelength_m**5
-    exponential_term = (e_numerical**planck_constant * speed_of_light / (wavelength_m * boltzmann_constant * sun_surface_temp_K))
-    
-    spectral_radiance = (numerator / denominator) * (np.float64(1) / (np.exp(exponential_term) - np.float64(1)))
-    
+    exponential_term = (planck_constant * speed_of_light / (wavelength_m * boltzmann_constant * sun_surface_temp_K))
+
+    try:
+        exp_val = np.exp(exponential_term)
+        manager = exp_val - 1.0
+
+        # Safeguard against numerical instability
+        if manager > 1e50 or np.isinf(manager) or np.isnan(manager):
+            spectral_radiance = 0.0
+        elif manager < 1e-10:
+            spectral_radiance = 0.0
+        else:
+            spectral_radiance = (numerator / denominator) * (1.0 / manager)
+
+    except OverflowError:
+        spectral_radiance = 0.0    
     # Calculate areas
     sun_area = np.float64(4) * pi_numerical * sun_radius_m**2
     spacecraft_area = pi_numerical * np.float64(spacecraft_radius_m)**2
